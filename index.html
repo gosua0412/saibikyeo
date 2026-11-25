@@ -14,11 +14,13 @@
 <title>사이비켜</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
 <script src="js/judge.js"></script>
-<script src="js/cult-places.js"></script>
+<script src="js/heresy.js"></script>
 <style>
 :root{
   --main:#0F7B6C; --main-soft:#E3F2EF; --main-deep:#0A5A4F;
@@ -295,13 +297,12 @@ textarea.input{resize:vertical;min-height:96px;line-height:1.5}
 .cbar button{height:44px;padding:0 16px;border-radius:12px;background:var(--main);color:#fff;font-weight:700;flex:none}
 .rules{background:var(--amber-soft);border-radius:12px;padding:12px 14px;font-size:13px;color:#6B4A00;line-height:1.6}
 .row .t span.pill{display:inline-block;width:auto}
-.row .t span.memo{margin-top:6px;padding-top:8px;border-top:1px solid var(--line);color:var(--ink);font-size:14px;line-height:1.55;white-space:pre-wrap;word-break:keep-all}
 .adminrow{background:var(--surf);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
 .adminrow .acts{display:flex;gap:8px}
 .adminrow .acts button{flex:1;height:40px;border-radius:10px;font-weight:600;font-size:14px}
 /* 실제 지도 (Leaflet) */
 .lmap{position:absolute;inset:0;z-index:0;background:#E7EEEC}
-.has-leaflet #map-svg,.has-leaflet #pick-svg,.has-leaflet .zoom{display:none}
+.has-leaflet #map-svg,.has-leaflet .pickmap > svg#pick-svg,.has-leaflet .zoom{display:none} /* 그림 지도가 실제 지도를 덮어 드래그를 막지 않도록 */
 .search,.locbtn,.pick-top,.cpin,.cshadow,.mapbadge{z-index:500}
 .leaflet-container{font:inherit}
 .cnt{width:34px;height:34px;border-radius:17px;background:var(--red);color:#fff;font-weight:700;font-size:14px;display:grid;place-items:center;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.25)}
@@ -326,63 +327,14 @@ textarea.input{resize:vertical;min-height:96px;line-height:1.5}
 .meter span.on.판단{background:var(--ink);color:#fff}
 .followq{background:var(--amber-soft);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-
-/* 뉴스 기사 (시연용 가상 사이트) */
-#v-newsread{background:#fff;color:#1a1a1a}
-#v-newsread .nb-url{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:8px;padding:10px 12px;background:#f2f2f4;border-bottom:1px solid #e2e2e6}
-#v-newsread .nb-url .x{width:32px;height:32px;border:none;background:none;display:grid;place-items:center;color:#333;cursor:pointer}
-#v-newsread .nb-url .addr{flex:1;display:flex;align-items:center;gap:6px;justify-content:center;background:#e4e4e8;border-radius:10px;padding:8px 10px;font-size:14px;color:#333}
-#v-newsread .nb-load{position:absolute;left:0;bottom:-1px;height:2px;background:#2f6bff;width:0}
-#v-newsread.on .nb-load{animation:nbload .9s ease-out forwards}
-@keyframes nbload{0%{width:0;opacity:1}80%{width:92%;opacity:1}100%{width:100%;opacity:0}}
-#v-newsread .nb-mast{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px;border-bottom:3px solid #1a1a1a}
-#v-newsread .nb-logo{font-family:'Noto Serif KR',serif;font-weight:900;font-size:24px;letter-spacing:-.5px}
-#v-newsread .nb-logo em{font-style:normal;color:#c8102e}
-#v-newsread .nb-cats{display:flex;gap:16px;padding:10px 18px;border-bottom:1px solid #e5e5e5;font-size:14px;color:#555;overflow-x:auto;white-space:nowrap}
-#v-newsread .nb-cats b{color:#c8102e}
-#v-newsread article{padding:20px 18px 8px}
-#v-newsread .nb-kick{font-size:13px;font-weight:600;color:#c8102e}
-#v-newsread h2.nb-h{font-family:'Noto Serif KR',serif;font-size:24px;line-height:1.38;font-weight:700;margin:8px 0 10px;letter-spacing:-.3px;word-break:keep-all}
-#v-newsread .nb-sub{font-size:15px;color:#444;line-height:1.55;border-left:3px solid #ddd;padding-left:10px;margin:0 0 14px;word-break:keep-all}
-#v-newsread .nb-meta{display:flex;justify-content:space-between;font-size:13px;color:#888;padding-bottom:14px;border-bottom:1px solid #eee}
-#v-newsread figure{margin:16px 0 6px}
-#v-newsread figure svg{display:block;width:100%;height:auto;border-radius:4px}
-#v-newsread figcaption{font-size:12.5px;color:#888;margin-top:6px;line-height:1.5}
-#v-newsread article p.t{font-size:16.5px;line-height:1.85;margin:16px 0;word-break:keep-all}
-#v-newsread .nb-box{background:#f7f7f8;border-radius:6px;padding:14px 16px;font-size:14.5px;line-height:1.7;margin:18px 0}
-#v-newsread .nb-box b{display:block;margin-bottom:4px}
-#v-newsread .nb-rel{padding:6px 18px 18px}
-#v-newsread .nb-rel h3{font-size:15px;margin:10px 0 4px;padding-top:14px;border-top:2px solid #1a1a1a}
-#v-newsread .nb-rel a{display:block;padding:11px 0;border-bottom:1px solid #eee;font-size:15px;color:#222;text-decoration:none;line-height:1.45}
-#v-newsread footer{background:#f2f2f4;color:#888;font-size:12px;line-height:1.7;padding:18px;margin-top:8px}
-
-/* 이단 단체 시설 (현대종교 자료) */
-.cultchip{position:absolute;left:16px;top:76px;z-index:500;display:flex;align-items:center;gap:6px;background:var(--bg);border:none;border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;font-weight:600;color:var(--ink);box-shadow:0 2px 10px rgba(0,0,0,.1);cursor:pointer}
-.cultchip i{width:10px;height:10px;border-radius:5px;background:#7B4FD6;display:block}
-.cultchip.off{color:var(--sub)}.cultchip.off i{background:var(--line)}
-.mapbadge.on~.cultchip,.has-badge .cultchip{top:116px}
-#cult-cv{position:absolute;inset:0;width:100%;height:100%;display:none;background:#EEF1F5;touch-action:none;cursor:grab;z-index:1}
-#cult-cv.on{display:block}
-.cultzoom{position:absolute;right:16px;bottom:76px;z-index:500;display:none;flex-direction:column;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.12)}
-.cultzoom.on{display:flex}
-.cultzoom button{width:44px;height:40px;border:none;background:var(--bg);font-size:20px;font-weight:600;color:var(--ink);cursor:pointer}
-.cultzoom button+button{border-top:1px solid var(--line)}
-.cdot{width:10px;height:10px;border-radius:5px;flex:none;display:inline-block}
-.cult-src{font-size:12.5px;color:var(--sub);line-height:1.55}
-.cult-sel{width:100%;height:42px;border:1.5px solid var(--line);border-radius:12px;padding:0 12px;font:inherit;font-size:14px;background:var(--bg);color:var(--ink)}
-.row.cult .dot{background:#F1ECFB}
-.row.cult.sel{outline:2px solid #7B4FD6;outline-offset:-2px}
-.leaflet-popup-content .cp b{display:block;font-size:14px;margin-bottom:2px}
-.leaflet-popup-content .cp span{display:block;color:#667;font-size:12.5px;line-height:1.5}
-
 /* 홈 화면에 추가(앱처럼 열기)했을 때 위·아래 시스템 영역 피하기 */
 :root{--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px)}
 .top{height:calc(60px + var(--sat));padding-top:var(--sat)}
 .tabbar{height:calc(84px + var(--sab));padding-bottom:calc(16px + var(--sab))}
 .has-tab .body{padding-bottom:calc(104px + var(--sab))}
 .search{top:calc(16px + var(--sat))}
-.mapbadge,.cultchip{top:calc(76px + var(--sat))}
-.mapbadge.on~.cultchip,.has-badge .cultchip{top:calc(116px + var(--sat))}
+.mapbadge{top:calc(76px + var(--sat))}
+#v-map .hz-bar{top:calc(72px + var(--sat))}
 .pick-top{top:calc(12px + var(--sat))}
 .pick-card{padding-bottom:calc(28px + var(--sab))}
 #v-main .news b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
@@ -541,9 +493,6 @@ textarea.input{resize:vertical;min-height:96px;line-height:1.5}
   <div class="mapwrap">
     <div class="lmap" id="lmap" aria-label="포교 제보 지도"></div>
     <div class="mapbadge" id="map-badge"></div>
-    <canvas id="cult-cv" aria-label="전국 이단 단체 시설 지도"></canvas>
-    <button class="cultchip" id="cult-chip" aria-pressed="true"><i></i><span id="cult-chip-t">이단 단체 시설</span></button>
-    <div class="cultzoom" id="cult-zoom"><button id="cult-zin" aria-label="확대">+</button><button id="cult-zout" aria-label="축소">−</button></div>
     <svg class="map" id="map-svg" viewBox="0 0 400 520" preserveAspectRatio="xMidYMid slice" role="img" aria-label="충남대 주변 제보 지도"></svg>
     <div class="search"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/></svg><input id="map-q" placeholder="장소나 수법으로 검색하세요" aria-label="제보 검색"></div>
     <button class="locbtn" id="loc-btn" aria-label="현재 위치"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
@@ -552,12 +501,6 @@ textarea.input{resize:vertical;min-height:96px;line-height:1.5}
     <div class="handle"></div>
     <div class="sec-head"><h2 id="map-title">주변 포교 제보</h2><button class="link" id="map-all" style="display:none">전체 보기</button></div>
     <div id="map-list" class="sec" style="gap:8px"></div>
-    <div class="sec" id="cult-sec" style="gap:8px;margin-top:10px">
-      <div class="sec-head"><h2 id="cult-title">가까운 이단 단체 시설</h2></div>
-      <select class="cult-sel" id="cult-group" aria-label="단체 고르기"><option value="">모든 단체</option></select>
-      <div id="cult-list" class="sec" style="gap:8px"></div>
-      <p class="cult-src">자료: 현대종교 「이단 위치 및 주소록」 · 전국 2,226곳<br>각 단체의 교회·시설 위치예요. 길거리 포교가 일어나는 장소와는 다를 수 있어요.</p>
-    </div>
   </div>
 </section>
 
@@ -661,34 +604,6 @@ textarea.input{resize:vertical;min-height:96px;line-height:1.5}
   <header class="top"><button class="ibtn back" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h1>커뮤니티</h1></header>
   <div class="body" id="post-body" style="gap:14px"></div>
   <form class="cbar" id="cmt-form" novalidate><textarea class="input" id="cmt-input" maxlength="500" rows="1" placeholder="댓글을 남겨주세요" aria-label="댓글"></textarea><button type="submit">등록</button></form>
-</section>
-
-<section class="view" id="v-newsread" aria-label="뉴스 기사">
-  <div class="nb-url" style="position:sticky"><button class="x back" aria-label="닫기"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-    <div class="addr"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>campusdaily.news</div>
-    <button class="x" aria-label="공유"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5M5 14v6h14v-6"/></svg></button><i class="nb-load"></i></div>
-  <div class="nb-mast"><span class="nb-logo">캠퍼스<em>데일리</em></span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></div>
-  <nav class="nb-cats"><span>전체</span><b>사회</b><span>대학</span><span>교육</span><span>지역</span><span>오피니언</span></nav>
-  <article>
-    <div class="nb-kick">사회 · 대학가</div>
-    <h2 class="nb-h">"설문조사 잠깐만요"… 신학기 대학가, 포교 접근에 학생들 '난감'</h2>
-    <p class="nb-sub">심리테스트·설문 가장한 접근 잇따라<br>전문가 "개인정보 주지 말고 단호히 거절해야"</p>
-    <div class="nb-meta"><span>이하늘 기자</span><span id="nb-date">2026.11.05 09:12</span></div>
-    <figure><svg viewBox="0 0 360 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="nbsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cfe0ee"/><stop offset="1" stop-color="#eef3f7"/></linearGradient></defs><rect width="360" height="200" fill="url(#nbsky)"/><rect x="0" y="150" width="360" height="50" fill="#c9c3b8"/><rect x="30" y="60" width="120" height="90" fill="#b9a68f"/><rect x="40" y="72" width="16" height="20" fill="#8fa6b8"/><rect x="66" y="72" width="16" height="20" fill="#8fa6b8"/><rect x="92" y="72" width="16" height="20" fill="#8fa6b8"/><rect x="118" y="72" width="16" height="20" fill="#8fa6b8"/><rect x="40" y="104" width="16" height="20" fill="#8fa6b8"/><rect x="66" y="104" width="16" height="20" fill="#8fa6b8"/><rect x="92" y="104" width="16" height="20" fill="#8fa6b8"/><rect x="118" y="104" width="16" height="20" fill="#8fa6b8"/><rect x="200" y="40" width="140" height="110" fill="#a9998a"/><rect x="250" y="110" width="40" height="40" fill="#6e5f52"/><circle cx="170" cy="150" r="22" fill="#7d9a6a"/><circle cx="185" cy="140" r="18" fill="#8fac7a"/><g fill="#4b4b55"><circle cx="110" cy="146" r="7"/><rect x="104" y="153" width="12" height="26" rx="5"/><circle cx="132" cy="148" r="6.5"/><rect x="126" y="154" width="12" height="24" rx="5" fill="#7a5c4a"/><circle cx="232" cy="146" r="7"/><rect x="226" y="153" width="12" height="26" rx="5" fill="#3c5c7a"/></g><rect x="138" y="160" width="10" height="13" fill="#f4f4f4"/></svg>
-      <figcaption>한 대학 캠퍼스에서 학생들이 오가고 있다. (기사 내용과 직접 관련 없음)</figcaption></figure>
-    <p class="t">신학기를 맞은 대학가에서 설문조사나 심리테스트를 핑계로 학생들에게 접근하는 사례가 이어지고 있다. 처음에는 짧은 질문으로 말을 걸지만, 대화가 길어지면 연락처를 묻거나 따로 만나 공부 모임에 오라고 권하는 식이다.</p>
-    <p class="t">대전의 한 대학에 다니는 A씨(20)는 "도서관 앞에서 '5분만 설문해 달라'고 해서 응했는데, 끝나고 나니 전화번호를 알려 달라며 계속 따라왔다"며 "거절하는 게 생각보다 어려웠다"고 말했다. 다른 학생 B씨(21)도 "역 근처에서 비슷한 일을 두 번이나 겪었다"고 했다.</p>
-    <p class="t">이런 접근은 처음부터 단체 이름을 밝히지 않는 경우가 많아 학생들이 알아차리기 어렵다. 특히 학교 생활에 아직 익숙하지 않은 신입생이 주로 대상이 된다는 지적이 나온다.</p>
-    <div class="nb-box"><b>이런 말을 들으면 의심해 보세요</b>· "인상이 좋아 보여서 말 걸었어요"<br>· "설문 끝나면 결과 알려줄게요, 번호 주세요"<br>· "좋은 공부 모임이 있는데 같이 가볼래요?"</div>
-    <p class="t">전문가들은 낯선 사람에게 개인정보를 알려주지 말고, 원하지 않으면 분명하게 거절한 뒤 자리를 떠나는 것이 좋다고 조언한다. 계속 따라오거나 위협을 느끼면 112에 신고하고, 학교 학생상담센터 등에서 도움을 받을 수 있다.</p>
-    <p class="t">한 상담 관계자는 "혼자 고민하지 말고 주변 친구나 상담 기관에 이야기하는 것만으로도 큰 도움이 된다"고 말했다.</p>
-    <p class="t" style="color:#888;font-size:14px">이하늘 기자 sky@campusdaily.news</p>
-  </article>
-  <div class="nb-rel"><h3>많이 본 뉴스</h3>
-    <a>대학가 '친절한 접근' 주의보… 거절하는 방법은</a>
-    <a>신입생 오리엔테이션서 '안전한 캠퍼스 생활' 교육 확대</a>
-    <a>"번호 알려주지 마세요" 학생회, 포교 대처 안내문 배포</a></div>
-  <footer>캠퍼스데일리 · 이 페이지는 서비스 시연을 위해 만든 가상의 뉴스 기사이며, 등장하는 매체와 인물은 실제와 관련이 없습니다.</footer>
 </section>
 
 <!-- 하단 탭 -->
@@ -843,9 +758,10 @@ const SAMPLE_REPORTS=[
   {id:'s7',area:'yuseong',lat:36.3539,lng:127.3418,method:2,time:3,spot:'유성온천역 3번 출구',memo:'(예시) 길을 묻더니 같은 방향이라며 따라옴',ago:160*H},
   {id:'s8',area:'bongmyeong',lat:36.3556,lng:127.3478,method:5,time:2,spot:'봉명동 먹자골목',memo:'(예시) 봉사 동아리라며 소속을 밝히지 않음',ago:200*H}
 ];
-const SAMPLE_NEWS=[
-  {id:'sn1',title:'캠퍼스 파고든 사이비 포교, 학생 92.6% 대처법 몰라',source:'서울과기대신문',ago:4*24*H},
-  {id:'sn2',title:'"나도 당했다" 피해 속출… 2030 직장인들 난리 난 이유',source:'한국경제',ago:90*24*H}
+const SAMPLE_NEWS=[ // 예방 소식 예시: 누르면 원문 기사로 이동
+  {id:'sn1',title:'캠퍼스 파고든 사이비 포교, 학생 92.6% 대처법 몰라',source:'서울과기대신문 718호',url:'',ago:Date.now()-Date.parse('2026-11-01T09:00:00+09:00')},
+  {id:'sn3',title:'대학가를 파고드는 불청객, 사이비',source:'서울과기대신문 702호',url:'https://times.seoultech.ac.kr/reports/?category=82&idx=21992',ago:Date.now()-Date.parse('2026-01-16T09:00:00+09:00')},
+  {id:'sn2',title:'"나도 당했다" 피해 속출… 2030 직장인들 난리 난 이유',source:'한국경제',url:'https://www.hankyung.com/article/2025081133647',ago:Date.now()-Date.parse('2025-08-11T09:00:00+09:00')}
 ];
 
 /* ===================== 공통 ===================== */
@@ -942,6 +858,11 @@ async function initStore(){
     if(!ls.get('seeded',false)){const now=Date.now();
       localSave('approved',[...localCol('approved'),...SAMPLE_REPORTS.map(({ago,...r})=>({...r,sample:true,createdAt:now-ago}))]);
       localSave('news',[...localCol('news'),...SAMPLE_NEWS.map(({ago,...n})=>({...n,createdAt:now-ago}))]);ls.set('seeded',true);}
+    { // 예시 소식 링크 보정: 이미 예시가 저장된 기기에도 링크·새 기사 반영
+      const cur=localCol('news');let ch=false;
+      SAMPLE_NEWS.forEach(({ago,...n})=>{const x=cur.find(c=>c.id===n.id);
+        if(x){if(n.url&&x.url!==n.url){x.url=n.url;ch=true;}}else{cur.push({...n,createdAt:Date.now()-ago});ch=true;}});
+      if(ch)localSave('news',cur);}
     refreshLocal();}
   renderMenu();renderAll();
 }
@@ -999,10 +920,10 @@ function renderNews(){
   if(store._news==='err'||store._news==='slow'&&!store.news.length){el.innerHTML='<div class="empty">소식을 불러오지 못했어요. 잠시 뒤 다시 열어주세요.</div>';return;}
   const list=store.news.slice(0,3);
   $('#news-admin').innerHTML=store.isAdmin?'<a class="link" href="#admin">소식 등록</a>':'';
-  el.innerHTML=list.length?list.map(n=>`<a href="#newsread"><b>${esc(n.title)}</b><span class="hint">${esc(n.source||'')}${n.source?' · ':''}${ago(n.createdAt)}</span></a>`).join('')
+  el.innerHTML=list.length?list.map(n=>{const safe=/^https?:\/\//.test(n.url||'');return `<${safe?'a href="'+esc(n.url)+'" target="_blank" rel="noopener"':'div class="it"'}><b>${esc(n.title)}</b><span class="hint">${esc(n.source||'')}${n.source?' · ':''}${ago(n.createdAt)}</span></${safe?'a':'div'}>`;}).join('')
     :'<div class="empty">아직 등록된 소식이 없어요</div>';
 }
-function reportRow(r,extra='',memo=''){return `<div class="row"${memo?' style="align-items:flex-start"':''}><span class="dot red">${ICON.pin}</span><span class="t"><b>${esc(areaName(r.area))} · ${esc(METHODS[r.method]||'기타')}${r.sample?' <span class="pill" style="background:var(--line);color:var(--sub)">예시</span>':''}</b><span>${esc(r.spot||'')} · ${ago(r.createdAt)}</span>${memo?`<span class="memo">${esc(memo)}</span>`:''}</span>${extra}</div>`;}
+function reportRow(r,extra=''){return `<div class="row"><span class="dot red">${ICON.pin}</span><span class="t"><b>${esc(areaName(r.area))} · ${esc(METHODS[r.method]||'기타')}${r.sample?' <span class="pill" style="background:var(--line);color:var(--sub)">예시</span>':''}</b><span>${esc(r.spot||'')} · ${ago(r.createdAt)}</span></span>${extra}</div>`;}
 $('#recent').addEventListener('click',()=>{if(store.approved.length)location.hash='#map';});
 function renderRecent(){
   const el=$('#recent');
@@ -1011,9 +932,7 @@ function renderRecent(){
   el.innerHTML=store.approved.length?store.approved.slice(0,1).map(r=>reportRow(r)).join(''):'<div class="empty">아직 게시된 제보가 없어요.<br>포교를 겪었다면 첫 제보를 남겨주세요.</div>';
 }
 /* ===================== 실제 지도 (Leaflet + OpenStreetMap) ===================== */
-// Claude 아티팩트 안에서는 바깥 지도 이미지(OpenStreetMap)를 불러올 수 없어서 그림 지도를 써요
-function leafletCssOk(){try{const d=document.createElement('div');d.className='leaflet-pane';document.body.appendChild(d);const ok=getComputedStyle(d).position==='absolute';d.remove();return ok;}catch(e){return false;}}
-const HAS_L=!!window.L&&!window.claude&&leafletCssOk();
+const HAS_L=!!window.L;
 if(HAS_L)document.body.classList.add('has-leaflet');
 const DEFAULT_CENTER=[36.3640,127.3480];
 const TILE_URL='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
@@ -1036,9 +955,9 @@ function ensureMap(){
   lmap=L.map('lmap',{zoomControl:false}).setView(DEFAULT_CENTER,15);
   L.tileLayer(TILE_URL,TILE_OPT).addTo(lmap);
   lmLayer=L.layerGroup().addTo(lmap);meLayer=L.layerGroup().addTo(lmap);
-  setTimeout(drawCultLeaflet,0);
+  window.Heresy&&Heresy.attach(lmap,()=>userPos); // 이단 정보 레이어(별도 레이어, 제보 코드와 분리)
 }
-function onMapShown(){if(!HAS_L)return;ensureMap();setTimeout(()=>{lmap.invalidateSize();renderMap();drawMe();},60);}
+function onMapShown(){if(!HAS_L)return;ensureMap();setTimeout(()=>{lmap.invalidateSize();renderMap();drawMe();window.Heresy&&Heresy.onShow();},60);}
 function drawMe(){
   if(!lmap||!userPos)return;meLayer.clearLayers();
   L.circle(userPos,{radius:radiusM(),color:'#2F6FED',weight:1.5,fillOpacity:.07}).addTo(meLayer);
@@ -1077,91 +996,13 @@ function renderMap(){
   $('#map-title').textContent=title;
   const badge=$('#map-badge');if(userPos){const n=store.approved.filter(r=>distM(userPos,latlngOf(r))<=radiusM()).length;badge.textContent=`내 주변 ${RADII[alertCfg.r]} · 제보 ${n}건`;badge.classList.add('on');}
   $('#map-all').style.display=mapFilter||q||(userPos&&!showAll)?'block':'none';
-  $('#map-list').innerHTML=!store.ready?'<div class="empty">제보를 불러오는 중이에요</div>':(list.length?list.slice(0,30).map(({r,d})=>reportRow(r,d!=null?`<span class="dist">${fmtDist(d)}</span>`:'',r.memo)).join(''):`<div class="empty">${userPos&&!showAll?'내 주변에는 아직 제보가 없어요':'표시할 제보가 없어요'}</div>`);
-  try{renderCultList();drawCultCanvas();}catch(e){}
+  $('#map-list').innerHTML=!store.ready?'<div class="empty">제보를 불러오는 중이에요</div>':(list.length?list.slice(0,30).map(({r,d})=>reportRow(r,d!=null?`<span class="dist">${fmtDist(d)}</span>`:'')+(r.memo?`<p class="muted" style="padding:0 16px 4px 70px;margin-top:-4px">${esc(r.memo)}</p>`:'')).join(''):`<div class="empty">${userPos&&!showAll?'내 주변에는 아직 제보가 없어요':'표시할 제보가 없어요'}</div>`);
 }
 $('#map-svg').addEventListener('click',e=>{const g=e.target.closest('.pin');if(!g)return;mapFilter=mapFilter&&mapFilter.has(g.dataset.id)?null:new Set([g.dataset.id]);renderMap();});
 $('#map-svg').addEventListener('keydown',e=>{if(e.key==='Enter'){const g=e.target.closest('.pin');if(g){mapFilter=new Set([g.dataset.id]);renderMap();}}});
 $('#map-q').addEventListener('input',()=>renderMap());
 $('#map-all').onclick=()=>{if(mapFilter||$('#map-q').value){mapFilter=null;$('#map-q').value='';}else showAll=true;renderMap();};
-$('#loc-btn').onclick=()=>locate(p=>{showAll=false;drawMe();if(lmap)lmap.setView(p,16);renderMap();toast('현재 위치를 찾았어요');});
-
-/* ===================== 이단 단체 시설 (현대종교 자료) ===================== */
-const CULT=window.CULT||{groups:[],pts:[]};
-const CULT_COLORS=['#7B4FD6','#E0662F','#C23B7A','#2F7FD1','#2E9A6B','#B8860B','#8A5A44','#D14B4B','#4A5ADB','#5F6B7A'];
-let cultOn=true,cultGroup='',cultSel=null,cultLayer=null;
-const cultPts=()=>CULT.pts.filter(p=>cultGroup===''||p[0]===+cultGroup);
-const cultRef=()=>userPos||DEFAULT_CENTER;
-(function(){const sel=$('#cult-group');if(!sel)return;
-  const cnt=CULT.groups.map((_,i)=>CULT.pts.filter(p=>p[0]===i).length);
-  sel.innerHTML='<option value="">모든 단체 ('+CULT.pts.length.toLocaleString()+'곳)</option>'+CULT.groups.map((g,i)=>`<option value="${i}">${esc(g)} (${cnt[i]})</option>`).join('');
-  sel.onchange=()=>{cultGroup=sel.value;cultSel=null;drawCultLeaflet();drawCultCanvas();renderCultList();};
-})();
-function cultPopup(p){return `<div class="cp"><b>${esc(p[1])}</b><span>${esc(CULT.groups[p[0]])}</span><span>${esc(p[4])}</span><span style="margin-top:4px;font-size:11.5px">자료: 현대종교</span></div>`;}
-function drawCultLeaflet(){
-  if(!HAS_L||!lmap)return;
-  if(!cultLayer)cultLayer=L.layerGroup();
-  cultLayer.clearLayers();
-  if(!cultOn){cultLayer.remove();return;}
-  const rd=L.canvas({padding:.3});
-  cultPts().forEach(p=>{L.circleMarker([p[2],p[3]],{renderer:rd,radius:6,color:'#fff',weight:1.5,fillColor:CULT_COLORS[p[0]%10],fillOpacity:.9}).bindPopup(cultPopup(p)).on('click',()=>{cultSel=p;renderCultList();}).addTo(cultLayer);});
-  cultLayer.addTo(lmap);
-}
-function renderCultList(){
-  const el=$('#cult-list');if(!el)return;
-  $('#cult-sec').style.display=cultOn?'flex':'none';
-  if(!cultOn)return;
-  const q=($('#map-q').value||'').trim(),ref=cultRef();
-  let list=cultPts().map(p=>({p,d:distM(ref,[p[2],p[3]])}));
-  if(q)list=list.filter(x=>(x.p[1]+' '+x.p[4]+' '+CULT.groups[x.p[0]]).includes(q));
-  list.sort((a,b)=>a.d-b.d);
-  if(cultSel){list=list.filter(x=>x.p!==cultSel);list.unshift({p:cultSel,d:distM(ref,[cultSel[2],cultSel[3]])});}
-  $('#cult-title').textContent=q?`이단 단체 시설 검색 ${list.length}곳`:(userPos?'내 주변 이단 단체 시설':'충남대 주변 이단 단체 시설');
-  el.innerHTML=list.length?list.slice(0,q?20:5).map(({p,d})=>`<div class="row cult${p===cultSel?' sel':''}" data-ci="${CULT.pts.indexOf(p)}" style="cursor:pointer"><span class="dot"><i class="cdot" style="background:${CULT_COLORS[p[0]%10]}"></i></span><span class="t"><b>${esc(p[1])}</b><span>${esc(CULT.groups[p[0]])} · ${esc(p[4])}</span></span><span class="dist">${fmtDist(d)}</span></div>`).join(''):'<div class="empty">검색한 이름의 시설이 없어요</div>';
-}
-$('#cult-list').addEventListener('click',e=>{const r=e.target.closest('[data-ci]');if(!r)return;const p=CULT.pts[+r.dataset.ci];cultSel=p;
-  if(HAS_L&&lmap){lmap.setView([p[2],p[3]],16);cultLayer&&cultLayer.eachLayer(m=>{const ll=m.getLatLng();if(ll.lat===p[2]&&ll.lng===p[3])m.openPopup();});}
-  else{if(!cv.on)toggleCultCanvas(true);cv.cx=p[3];cv.cy=p[2];cv.s=Math.max(cv.s,2600);drawCultCanvas();}
-  renderCultList();$('#v-map .mapwrap').scrollIntoView({behavior:'smooth'});});
-
-/* 그림 지도(Claude 앱)에서 쓰는 전국 시설 점 지도 */
-const cv={on:false,cx:127.8,cy:36.0,s:95,drag:null,pts:new Map()};
-const CITIES=[['서울',37.5665,126.978],['인천',37.4563,126.7052],['수원',37.2636,127.0286],['춘천',37.8813,127.7298],['강릉',37.7519,128.8761],['청주',36.6424,127.489],['대전',36.3504,127.3845],['전주',35.8242,127.148],['광주',35.1595,126.8526],['대구',35.8714,128.6014],['울산',35.5384,129.3114],['부산',35.1796,129.0756],['제주',33.4996,126.5312],['포항',36.019,129.3435],['목포',34.8118,126.3922]];
-function cvXY(lat,lng,W,H){const k=Math.cos(36*Math.PI/180);return [W/2+(lng-cv.cx)*cv.s*k,H/2-(lat-cv.cy)*cv.s];}
-function drawCultCanvas(){
-  const c=$('#cult-cv');if(!cv.on||!c)return;
-  const dpr=window.devicePixelRatio||1,W=c.clientWidth,H=c.clientHeight;if(!W)return;
-  if(c.width!==W*dpr||c.height!==H*dpr){c.width=W*dpr;c.height=H*dpr;}
-  const g=c.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);
-  g.fillStyle='#EEF1F5';g.fillRect(0,0,W,H);
-  const r=cv.s>1500?6:cv.s>500?4.5:3;
-  cultPts().forEach(p=>{const [x,y]=cvXY(p[2],p[3],W,H);if(x<-10||y<-10||x>W+10||y>H+10)return;g.beginPath();g.arc(x,y,r,0,7);g.fillStyle=CULT_COLORS[p[0]%10];g.globalAlpha=.8;g.fill();g.globalAlpha=1;if(r>4){g.strokeStyle='#fff';g.lineWidth=1.2;g.stroke();}});
-  g.font='600 12px "IBM Plex Sans KR",sans-serif';g.textAlign='center';
-  CITIES.forEach(([n,la,lo])=>{const [x,y]=cvXY(la,lo,W,H);if(x<0||y<0||x>W||y>H)return;g.lineWidth=3;g.strokeStyle='rgba(255,255,255,.9)';g.strokeText(n,x,y-8);g.fillStyle='#3A4252';g.fillText(n,x,y-8);});
-  const me=cultRef(),[mx,my]=cvXY(me[0],me[1],W,H);g.beginPath();g.arc(mx,my,7,0,7);g.fillStyle='#2F6FED';g.fill();g.lineWidth=3;g.strokeStyle='#fff';g.stroke();
-  if(cultSel){const [x,y]=cvXY(cultSel[2],cultSel[3],W,H);g.beginPath();g.arc(x,y,11,0,7);g.lineWidth=3;g.strokeStyle='#1A1A1A';g.stroke();
-    g.font='700 13px "IBM Plex Sans KR",sans-serif';g.lineWidth=4;g.strokeStyle='#fff';g.strokeText(cultSel[1],x,y-16);g.fillStyle='#1A1A1A';g.fillText(cultSel[1],x,y-16);}
-}
-function toggleCultCanvas(on){cv.on=on;$('#cult-cv').classList.toggle('on',on);$('#cult-zoom').classList.toggle('on',on);$('#cult-chip-t').textContent=on?'제보 지도로 돌아가기':'전국 이단 단체 시설 지도';
-  if(on){const me=cultRef();cv.cx=me[1];cv.cy=me[0];cv.s=1400;requestAnimationFrame(drawCultCanvas);}}
-(function(){const c=$('#cult-cv');if(!c)return;
-  c.addEventListener('pointerdown',e=>{c.setPointerCapture(e.pointerId);cv.drag={x:e.clientX,y:e.clientY,cx:cv.cx,cy:cv.cy,moved:false};});
-  c.addEventListener('pointermove',e=>{const d=cv.drag;if(!d)return;const k=Math.cos(36*Math.PI/180),dx=e.clientX-d.x,dy=e.clientY-d.y;if(Math.abs(dx)+Math.abs(dy)>4)d.moved=true;cv.cx=d.cx-dx/(cv.s*k);cv.cy=d.cy+dy/cv.s;drawCultCanvas();});
-  c.addEventListener('pointerup',e=>{const d=cv.drag;cv.drag=null;if(!d||d.moved)return;
-    const b=c.getBoundingClientRect(),x=e.clientX-b.left,y=e.clientY-b.top;let best=null,bd=20*20;
-    cultPts().forEach(p=>{const [px,py]=cvXY(p[2],p[3],b.width,b.height);const dd=(px-x)**2+(py-y)**2;if(dd<bd){bd=dd;best=p;}});
-    cultSel=best;drawCultCanvas();renderCultList();if(best)toast(best[1]+' · '+CULT.groups[best[0]]);});
-  c.addEventListener('wheel',e=>{e.preventDefault();cv.s=Math.min(20000,Math.max(60,cv.s*(e.deltaY<0?1.25:.8)));drawCultCanvas();},{passive:false});
-  $('#cult-zin').onclick=()=>{cv.s=Math.min(20000,cv.s*1.6);drawCultCanvas();};
-  $('#cult-zout').onclick=()=>{cv.s=Math.max(60,cv.s/1.6);drawCultCanvas();};
-  window.addEventListener('resize',()=>drawCultCanvas());
-})();
-$('#cult-chip').onclick=()=>{
-  if(HAS_L){cultOn=!cultOn;$('#cult-chip').classList.toggle('off',!cultOn);$('#cult-chip').setAttribute('aria-pressed',cultOn);drawCultLeaflet();renderCultList();if(cultOn)toast('보라색 계열 점이 이단 단체 시설이에요 (자료: 현대종교)');}
-  else toggleCultCanvas(!cv.on);
-};
-if(!HAS_L)$('#cult-chip-t').textContent='전국 이단 단체 시설 지도';
-
+$('#loc-btn').onclick=()=>locate(p=>{showAll=false;drawMe();if(lmap)lmap.setView(p,16);renderMap();window.Heresy&&Heresy.refresh();toast('현재 위치를 찾았어요');});
 
 function renderMenu(){
   const el=$('#mypage-list');if(!el)return;
@@ -1499,12 +1340,7 @@ function checkNearby(){
   showBanner(t,s);buzz([200,100,200]);
   try{if('Notification' in window&&Notification.permission==='granted'&&document.hidden)new Notification('사이비켜',{body:t+' '+s});}catch(e){}
 }
-// Claude 아티팩트 안에서는 GPS를 쓸 수 없어서, 궁동 근처에 있다고 가정하는 시연 모드로 동작해요
-const DEMO_MODE=!!window.claude,DEMO_POS=[36.3622,127.3512];let demoT=null;
 function startWatch(){
-  if(DEMO_MODE){userPos=DEMO_POS.slice();clearTimeout(demoT);
-    demoT=setTimeout(()=>{if(!alertCfg.on)return;if(nearbyReports().length)checkNearby();else toast(`근처 ${RADII[alertCfg.r]} 안에는 아직 제보가 없어요`);},2500);
-    return true;}
   if(!navigator.geolocation){toast('이 브라우저에서는 위치 알림을 쓸 수 없어요');return false;}
   if(watchId!=null)return true;
   watchId=navigator.geolocation.watchPosition(p=>{userPos=[p.coords.latitude,p.coords.longitude];drawMe();checkNearby();if($('#v-map').classList.contains('on'))renderMap();},
@@ -1512,14 +1348,13 @@ function startWatch(){
     {enableHighAccuracy:true,maximumAge:15000});
   return true;
 }
-function stopWatch(){clearTimeout(demoT);if(watchId!=null)navigator.geolocation.clearWatch(watchId);watchId=null;}
+function stopWatch(){if(watchId!=null)navigator.geolocation.clearWatch(watchId);watchId=null;}
 $('#alert-switch').onclick=()=>{
   alertCfg.on=!alertCfg.on;ls.set('alert',alertCfg);renderAlertPill();
   if(alertCfg.on){if(startWatch())toast('위치 알림을 켰어요. 이 페이지를 열어 둔 동안 알려드려요');try{if('Notification' in window&&Notification.permission==='default')Notification.requestPermission();}catch(e){}}
   else{stopWatch();toast('위치 알림을 껐어요');}
 };
 $('#notif-test').onclick=()=>{const n=userPos?nearbyReports().length:store.approved.length;showBanner(`근처 ${RADII[alertCfg.r]} 안에 포교 제보가 ${n||3}건 있어요`,'설문·심리테스트 요청을 조심하세요.');buzz([200]);};
-if(DEMO_MODE){const h=document.querySelector('#v-alert .body > p.hint:last-child');if(h)h.textContent='Claude 앱에서는 실제 위치를 쓸 수 없어서 궁동 근처에 있다고 가정해 알려줘요 (시연 모드)';}
 if(alertCfg.on)startWatch();
 
 /* ===================== 지역별 상담소 ===================== */
